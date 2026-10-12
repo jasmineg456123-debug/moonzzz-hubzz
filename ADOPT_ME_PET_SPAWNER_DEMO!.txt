@@ -1,0 +1,123 @@
+
+-- 🐾 PET SPAWNER 🐾
+-- Local interface demo for Delta
+-- Does NOT grant real Adopt Me! pets.
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local old = playerGui:FindFirstChild("PetSpawnerDemo")
+if old then old:Destroy() end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "PetSpawnerDemo"
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.fromOffset(310, 390)
+frame.Position = UDim2.new(0.5, -155, 0.5, -195)
+frame.BackgroundColor3 = Color3.fromRGB(31, 35, 52)
+frame.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 16)
+corner.Parent = frame
+
+local function makeLabel(text, pos, size)
+    local label = Instance.new("TextLabel")
+    label.Position = pos
+    label.Size = size
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.TextScaled = true
+    label.Font = Enum.Font.GothamBold
+    label.Parent = frame
+    return label
+end
+
+local function makeButton(text, pos, size)
+    local b = Instance.new("TextButton")
+    b.Position = pos
+    b.Size = size
+    b.BackgroundColor3 = Color3.fromRGB(70, 91, 140)
+    b.TextColor3 = Color3.new(1, 1, 1)
+    b.Text = text
+    b.TextScaled = true
+    b.Font = Enum.Font.GothamMedium
+    b.Parent = frame
+
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 9)
+    c.Parent = b
+    return b
+end
+
+makeLabel("🐾 PET SPAWNER 🐾",
+    UDim2.fromOffset(10, 12), UDim2.new(1, -20, 0, 40))
+
+makeLabel("Enter pet's name:",
+    UDim2.fromOffset(18, 62), UDim2.new(1, -36, 0, 25))
+
+local input = Instance.new("TextBox")
+input.Position = UDim2.fromOffset(18, 92)
+input.Size = UDim2.new(1, -36, 0, 42)
+input.PlaceholderText = "e.g. Frost Dragon"
+input.Text = ""
+input.TextScaled = true
+input.ClearTextOnFocus = false
+input.BackgroundColor3 = Color3.fromRGB(245, 245, 255)
+input.TextColor3 = Color3.fromRGB(25, 25, 35)
+input.Parent = frame
+
+local neon = false
+local mega = false
+local fly = false
+local ride = false
+
+local function toggle(text, y, initial, callback)
+    local b = makeButton(text .. ": OFF",
+        UDim2.fromOffset(18, y), UDim2.new(1, -36, 0, 36))
+
+    b.Activated:Connect(function()
+        initial = not initial
+        b.Text = text .. (initial and ": ON" or ": OFF")
+        callback(initial)
+    end)
+end
+
+toggle("✨ Neon", 148, false, function(v) neon = v end)
+toggle("🌈 Mega Neon", 190, false, function(v) mega = v end)
+toggle("🪽 Fly", 232, false, function(v) fly = v end)
+toggle("🐎 Ride", 274, false, function(v) ride = v end)
+
+local spawn = makeButton("SPAWN PET",
+    UDim2.fromOffset(18, 320), UDim2.new(1, -36, 0, 36))
+spawn.BackgroundColor3 = Color3.fromRGB(47, 170, 120)
+
+local status = makeLabel("Demo only — no real pet is added.",
+    UDim2.fromOffset(12, 360), UDim2.new(1, -24, 0, 22))
+status.Font = Enum.Font.Gotham
+status.TextScaled = true
+
+spawn.Activated:Connect(function()
+    local name = input.Text:gsub("^%s+", ""):gsub("%s+$", "")
+    if name == "" then
+        status.Text = "Please enter a pet name!"
+        return
+    end
+
+    status.Text = "Preview: " .. name
+        .. (neon and " | Neon" or "")
+        .. (mega and " | Mega Neon" or "")
+        .. (fly and " | Fly" or "")
+        .. (ride and " | Ride" or "")
+end)
+
+local close = makeButton("✕", UDim2.new(1, -34, 0, 4),
+    UDim2.fromOffset(28, 28))
+close.Activated:Connect(function()
+    gui:Destroy()
+end)
